@@ -23,7 +23,9 @@
 #define HITS_PERCENTAGE 1.1
 #define HITS_REQUIRED (float) NONCE_TARGET/0xffffffff*(1<<FIELD_SIZE_BITS)*HITS_PERCENTAGE
 
-#define OUTPUT_FILE_NAME "C:/Users/lucas/Documents/codeblocksproj/fastsha/output.csv"
+//ENTER OUTPUT FILE PATHE
+#define OUTPUT_FILE_NAME "output.csv"
+
 
 struct data1Type{
     uint32_t data[16];
