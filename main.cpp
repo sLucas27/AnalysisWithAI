@@ -188,14 +188,6 @@ void manager(data1Type* inp1, data2Type* inp2, size_t inpLen){
 
 int main()
 {
-    for(uint32_t i = 0; i < 16; i++){
-        for(uint32_t s = 8; s > 0; s--){
-            char c = lookupBinToChar(0xabcdef12>>(s-1)*4);
-            std::cout << c;
-        }
-    }
-    std::cout << std::endl;
-
     std::cout << "HITS REQUIRED: " << HITS_REQUIRED << std::endl;
     std::cout << "WORK AMOUNT: " << NUMBER_OF_SETS << std::endl;
     std::cout << "WORK SIZE: " << (1<<(FIELD_SIZE_BITS)) << std::endl;
