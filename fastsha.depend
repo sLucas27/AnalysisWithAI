@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1607261277 source:c:\users\lucas\documents\codeblocksproj\fastsha\main.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<mutex>
+	<thread>
+	<Funcs.h>
+
+1607254258 c:\users\lucas\documents\codeblocksproj\fastsha\include\funcs.h
+	<x86intrin.h>
+	<stdint.h>
+	<boost/shared_ptr.hpp>
+
+1607254243 source:c:\users\lucas\documents\codeblocksproj\fastsha\src\funcs.cpp
+	"Funcs.h"
+
