@@ -31,10 +31,10 @@ const uint32_t H[] = {
     0x5be0cd19
 };
 
-boost::shared_ptr<vargroup> helper_full_sha256(uint32_t* inp, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH){
+boost::shared_ptr<vargroup> helper_full_sha256(const uint32_t* inp, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH){
     return helper_full_sha256(inp, inp+16, nonce, knownMessageIntermediaryH);
 }
-boost::shared_ptr<vargroup> helper_full_sha256(uint32_t* inp1, uint32_t* inp2, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH){
+boost::shared_ptr<vargroup> helper_full_sha256(const uint32_t* inp1, const uint32_t* inp2, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH){
     if(!knownMessageIntermediaryH){
         knownMessageIntermediaryH = sha256_createMessage(inp1);
     }
@@ -43,7 +43,7 @@ boost::shared_ptr<vargroup> helper_full_sha256(uint32_t* inp1, uint32_t* inp2, u
     return sha256_round2((uint32_t*) intermediaryH.get());
 }
 
-boost::shared_ptr<vargroup> sha256_createMessage(uint32_t* M){
+boost::shared_ptr<vargroup> sha256_createMessage(const uint32_t* M){
     uint32_t W[64];
     for(uint32_t t = 0; t < 16; t++){
         W[t] = M[t];
@@ -81,7 +81,7 @@ boost::shared_ptr<vargroup> sha256_createMessage(uint32_t* M){
     return varsPtr;
 }
 
-boost::shared_ptr<uint32_t[]> sha256_expander1(uint32_t* M, uint32_t nonce){
+boost::shared_ptr<uint32_t[]> sha256_expander1(const uint32_t* M, uint32_t nonce){
     boost::shared_ptr<uint32_t[]> W(new uint32_t[64]);
     for(uint32_t t = 0; t < 3; t++){
         W[t] = M[t];

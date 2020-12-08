@@ -11,6 +11,7 @@
 #include <thread>
 
 #include <Funcs.h>
+#include <Data.h>
 
 #define TOGGLE_DEBUG 9
 
@@ -23,72 +24,15 @@
 #define HITS_PERCENTAGE 1.1
 #define HITS_REQUIRED (float) NONCE_TARGET/0xffffffff*(1<<FIELD_SIZE_BITS)*HITS_PERCENTAGE
 
-//ENTER OUTPUT FILE PATHE
-#define OUTPUT_FILE_NAME "output.csv"
+#define OUTPUT_FILE_NAME "C:/Users/lucas/Documents/codeblocksproj/fastsha/output.csv"
 
 
-struct data1Type{
-    uint32_t data[16];
-};
-
-struct data2Type{
-    uint32_t data[3];
-};
-
-data1Type data1[3] = {
-    {
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-        0x00000000, 0x00000000,
-    },
-    {
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-        0x00010203, 0x04050607,
-    },
-    {
-        0x14499318, 0x52517638,
-        0x32638230, 0x94525729,
-        0x14719525, 0x27745128,
-        0x03337250, 0x10369376,
-        0x06040537, 0x53982738,
-        0x68258214, 0x18781574,
-        0x45634192, 0x53376388,
-        0x84253073, 0x18253826,
-    },
-};
-
-data2Type data2[3] = {
-    {
-        0x00000000, 0x00000000,
-        0x00000000,
-    },
-    {
-        0x00010203, 0x04050607,
-        0x00010203,
-    },
-    {
-        0x45305720, 0x02580252,
-        0x58225523,
-    },
-};
-
-char lookupBinToChar(uint32_t inp){
+char lookupBinToChar(const uint32_t inp){
     const char lookupTable[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
     return lookupTable[inp&0x0f];
 }
 
-void writeResultToFile(std::ofstream& oFile, std::mutex& oFileMtx, uint32_t* inp1, uint32_t* inp2, boost::shared_ptr<std::vector<uint32_t>> lowValueFieldNumbersPtr){
+void writeResultToFile(std::ofstream& oFile, std::mutex& oFileMtx, const uint32_t* inp1, const uint32_t* inp2, boost::shared_ptr<std::vector<uint32_t>> lowValueFieldNumbersPtr){
     std::lock_guard<std::mutex> oFileLck(oFileMtx);
     oFile << "[\"";
     for(uint32_t i = 0; i < 16; i++){
@@ -115,11 +59,11 @@ void writeResultToFile(std::ofstream& oFile, std::mutex& oFileMtx, uint32_t* inp
     oFile.flush();
 }
 
-void writeResultToFile(std::ofstream& oFile, std::mutex& oFileMtx, uint32_t* inp, boost::shared_ptr<std::vector<uint32_t>> lowValueFieldNumbersPtr){
+void writeResultToFile(std::ofstream& oFile, std::mutex& oFileMtx, const uint32_t* inp, boost::shared_ptr<std::vector<uint32_t>> lowValueFieldNumbersPtr){
     writeResultToFile(oFile,oFileMtx,inp,inp+16,lowValueFieldNumbersPtr);
 }
 
-uint32_t calculateEntry(uint32_t* inp1, uint32_t* inp2){
+uint32_t calculateEntry(const uint32_t* inp1, const uint32_t* inp2){
     boost::shared_ptr<vargroup> preservedMessageH(nullptr);
 
     uint32_t i = 0;
@@ -142,7 +86,7 @@ uint32_t calculateEntry(uint32_t* inp1, uint32_t* inp2){
     return bestField;
 }
 
-boost::shared_ptr<std::vector<uint32_t>> calculateEntries(uint32_t* inp1, uint32_t* inp2){
+boost::shared_ptr<std::vector<uint32_t>> calculateEntries(const uint32_t* inp1, const uint32_t* inp2){
     boost::shared_ptr<vargroup> preservedMessageH(nullptr);
     uint32_t i = 0;
     boost::shared_ptr<std::vector<uint32_t>> results(new std::vector<uint32_t>());
@@ -163,18 +107,18 @@ boost::shared_ptr<std::vector<uint32_t>> calculateEntries(uint32_t* inp1, uint32
     return results;
 }
 
-void makeTrainingDataOnBlock(std::ofstream& outputFile, std::mutex& outputFileMtx, uint32_t* inp1, uint32_t* inp2){
+void makeTrainingDataOnBlock(std::ofstream& outputFile, std::mutex& outputFileMtx, const uint32_t* inp1, const uint32_t* inp2){
     boost::shared_ptr<std::vector<uint32_t>> lowValueFieldsPtr = calculateEntries(inp1, inp2);
     writeResultToFile(outputFile,outputFileMtx,inp1,inp2,lowValueFieldsPtr);
 }
 
-void manager(data1Type* inp1, data2Type* inp2, size_t inpLen){
+void manager(const DataType* inp, size_t inpLen){
     std::ofstream outputFile(OUTPUT_FILE_NAME,std::ios::out|std::ios::trunc);
     std::mutex outputFileMtx;
 
     std::vector<std::thread> threads;
     for(size_t i = 0; i < inpLen; i++){
-        std::thread t(makeTrainingDataOnBlock,std::ref(outputFile),std::ref(outputFileMtx),inp1[i].data,inp2[i].data);
+        std::thread t(makeTrainingDataOnBlock,std::ref(outputFile),std::ref(outputFileMtx),inp[i].d1.data,inp[i].d2.data);
         threads.push_back(std::move(t));
     }
 
@@ -191,14 +135,29 @@ int main()
     std::cout << "HITS REQUIRED: " << HITS_REQUIRED << std::endl;
     std::cout << "WORK AMOUNT: " << NUMBER_OF_SETS << std::endl;
     std::cout << "WORK SIZE: " << (1<<(FIELD_SIZE_BITS)) << std::endl;
+    std::cout << "NONCE TARGET: " << NONCE_TARGET << std::endl;
 
-    /*boost::shared_ptr<std::vector<uint32_t>> res = calculateEntries(data1[2],data2[2]);
-    for(uint32_t re:res.get()[0]){
-        std::cout << re << std::endl;
-    }*/
-    std::cout << NONCE_TARGET << " : " << HITS_REQUIRED << std::endl;
+    std::cout << "------------------------------------Verifying validity with test vector------------------------------------" << std::endl;
+    std::cout << "Generate output: ";
+    boost::shared_ptr<vargroup> temp(nullptr);
+    uint32_t dat[] = {0x01000000,0x9500c43a,0x25c62452,0x0b5100ad,0xf82cb9f9,0xda72fd24,0x47a496bc,0x600b0000,0x00000000,0x6cd86237,0x0395dedf,0x1da2841c,0xcda0fc48,0x9e3039de,0x5f1ccdde,0xf0e83499,0x1a65600e,0xa6c8cb4d,0xb3936a1a};
+    temp = helper_full_sha256(dat,0xe3143991,temp);
+    for(uint32_t i = 0; i < 8; i++){
+        for(uint32_t s = 8; s > 0; s--){
+            char c = lookupBinToChar(((uint32_t*)(temp.get()))[i]>>(s-1)*4);
+            std::cout << c;
+        }
+    }
+    std::cout << std::endl;
+    std::cout << "Expected output: " << "CAC383CDF62F68EFAA8064E35F6FC4DFC8AA74610C6580ED1729000000000000" << std::endl;
+    std::cout << "This is the 123456 block in the BTC blockchain." << std::endl;
+    //https://learnmeabitcoin.com/explorer/block/0000000000002917ED80650C6174AAC8DFC46F5FE36480AAEF682FF6CD83C3CA
+    std::cout << "https://learnmeabitcoin.com/explorer/block/0000000000002917ED80650C6174AAC8DFC46F5FE36480AAEF682FF6CD83C3CA" << std::endl;
+    std::cout << "----------------------------------------------------END----------------------------------------------------" << std::endl;
 
-    manager(data1,data2,2);
+
+    //make sure to replace siyeof(... with a low number (around 2) so that the computer used for testing is not being overwhelmed with tons of parallel threaded sha256 operations :D
+    manager(heads,sizeof(heads)/sizeof(DataType));
 
     return 0;
 }

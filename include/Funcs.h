@@ -77,11 +77,11 @@ inline uint32_t T2(uint32_t a, uint32_t b, uint32_t c){
     return Sum0(a) + Maj(a,b,c);
 }
 
-boost::shared_ptr<vargroup> helper_full_sha256(uint32_t* inp, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH);
-boost::shared_ptr<vargroup> helper_full_sha256(uint32_t* inp1, uint32_t* inp2, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH);
+boost::shared_ptr<vargroup> helper_full_sha256(const uint32_t* inp, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH);
+boost::shared_ptr<vargroup> helper_full_sha256(const uint32_t* inp1, const uint32_t* inp2, uint32_t nonce, boost::shared_ptr<vargroup>& knownMessageIntermediaryH);
 
-boost::shared_ptr<vargroup> sha256_createMessage(uint32_t* M);
-boost::shared_ptr<uint32_t[]> sha256_expander1(uint32_t* M, uint32_t nonce);
+boost::shared_ptr<vargroup> sha256_createMessage(const uint32_t* M);
+boost::shared_ptr<uint32_t[]> sha256_expander1(const uint32_t* M, uint32_t nonce);
 boost::shared_ptr<vargroup> sha256_compressor1(uint32_t* W, const uint32_t* const iH);
 boost::shared_ptr<vargroup> sha256_round2(uint32_t* prevH);
 #endif // FUNCS_H
